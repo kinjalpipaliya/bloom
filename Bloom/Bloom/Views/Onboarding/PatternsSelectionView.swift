@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MoodSelectionView: View {
+struct PatternsSelectionView: View {
     @ObservedObject var viewModel: OnboardingViewModel
 
     private let columns = [
@@ -27,24 +27,24 @@ struct MoodSelectionView: View {
                     VStack(alignment: .leading, spacing: 22) {
                         Spacer().frame(height: 18)
 
-                        Text("How have you been feeling lately?")
+                        Text("Which inner patterns have been getting in your way?")
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(BloomTheme.textPrimary)
 
-                        Text("Choose the ones that feel closest to your current state.")
+                        Text("Awareness makes it easier to reshape what keeps repeating.")
                             .font(.system(size: 16, weight: .regular))
                             .foregroundStyle(BloomTheme.textSecondary)
                             .lineSpacing(5)
 
                         LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(viewModel.moods) { mood in
+                            ForEach(viewModel.patterns) { item in
                                 SelectionTile(
-                                    emoji: mood.emoji,
-                                    title: mood.title,
-                                    subtitle: mood.subtitle,
-                                    isSelected: viewModel.isMoodSelected(mood)
+                                    emoji: item.emoji,
+                                    title: item.title,
+                                    subtitle: item.subtitle,
+                                    isSelected: viewModel.isPatternSelected(item)
                                 ) {
-                                    viewModel.toggleMood(mood)
+                                    viewModel.togglePattern(item)
                                 }
                             }
                         }
@@ -69,7 +69,7 @@ struct MoodSelectionView: View {
 
                 BottomCTAButton(
                     title: "Continue",
-                    enabled: viewModel.canContinueFromMood
+                    enabled: viewModel.canContinueFromPatterns
                 ) {
                     viewModel.goNext()
                 }

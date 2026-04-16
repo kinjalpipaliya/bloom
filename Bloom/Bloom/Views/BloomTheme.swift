@@ -19,12 +19,6 @@ enum BloomTheme {
         endPoint: .trailing
     )
 
-    static let selectedGradient = LinearGradient(
-        colors: [lavender.opacity(0.9), rose.opacity(0.65)],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
-
     static let pagePadding: CGFloat = 24
     static let cardCorner: CGFloat = 28
     static let buttonCorner: CGFloat = 24

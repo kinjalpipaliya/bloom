@@ -1,12 +1,7 @@
 import SwiftUI
 
-struct MoodSelectionView: View {
+struct EnergySelectionView: View {
     @ObservedObject var viewModel: OnboardingViewModel
-
-    private let columns = [
-        GridItem(.flexible(), spacing: 14),
-        GridItem(.flexible(), spacing: 14)
-    ]
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -27,24 +22,24 @@ struct MoodSelectionView: View {
                     VStack(alignment: .leading, spacing: 22) {
                         Spacer().frame(height: 18)
 
-                        Text("How have you been feeling lately?")
+                        Text("How has your energy been showing up lately?")
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(BloomTheme.textPrimary)
 
-                        Text("Choose the ones that feel closest to your current state.")
+                        Text("Choose the one that feels most true for this phase of life.")
                             .font(.system(size: 16, weight: .regular))
                             .foregroundStyle(BloomTheme.textSecondary)
                             .lineSpacing(5)
 
-                        LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(viewModel.moods) { mood in
+                        VStack(spacing: 14) {
+                            ForEach(viewModel.energy) { item in
                                 SelectionTile(
-                                    emoji: mood.emoji,
-                                    title: mood.title,
-                                    subtitle: mood.subtitle,
-                                    isSelected: viewModel.isMoodSelected(mood)
+                                    emoji: item.emoji,
+                                    title: item.title,
+                                    subtitle: item.subtitle,
+                                    isSelected: viewModel.isEnergySelected(item)
                                 ) {
-                                    viewModel.toggleMood(mood)
+                                    viewModel.selectEnergy(item)
                                 }
                             }
                         }
@@ -69,7 +64,7 @@ struct MoodSelectionView: View {
 
                 BottomCTAButton(
                     title: "Continue",
-                    enabled: viewModel.canContinueFromMood
+                    enabled: viewModel.canContinueFromEnergy
                 ) {
                     viewModel.goNext()
                 }

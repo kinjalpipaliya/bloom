@@ -26,7 +26,7 @@ struct SupportStyleView: View {
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(BloomTheme.textPrimary)
 
-                        Text("Choose the style that feels easiest to return to consistently.")
+                        Text("Pick the style that feels easiest to return to consistently.")
                             .font(.system(size: 16, weight: .regular))
                             .foregroundStyle(BloomTheme.textSecondary)
                             .lineSpacing(5)
@@ -50,33 +50,29 @@ struct SupportStyleView: View {
                 }
             }
 
-            bottomBar
+            VStack(spacing: 0) {
+                LinearGradient(
+                    colors: [
+                        BloomTheme.background.opacity(0.0),
+                        BloomTheme.background.opacity(0.82),
+                        BloomTheme.background
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 60)
+
+                BottomCTAButton(
+                    title: "See my Bloom path",
+                    enabled: viewModel.canContinueFromSupportStyle
+                ) {
+                    viewModel.goNext()
+                }
+                .padding(.horizontal, BloomTheme.pagePadding)
+                .padding(.bottom, 18)
+                .background(BloomTheme.background)
+            }
         }
         .navigationBarBackButtonHidden(true)
-    }
-
-    private var bottomBar: some View {
-        VStack(spacing: 0) {
-            LinearGradient(
-                colors: [
-                    BloomTheme.background.opacity(0.0),
-                    BloomTheme.background.opacity(0.82),
-                    BloomTheme.background
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 60)
-
-            BottomCTAButton(
-                title: "See my Bloom path",
-                enabled: viewModel.canContinueFromSupportStyle
-            ) {
-                viewModel.goNext()
-            }
-            .padding(.horizontal, BloomTheme.pagePadding)
-            .padding(.bottom, 18)
-            .background(BloomTheme.background)
-        }
     }
 }

@@ -34,13 +34,28 @@ struct PersonalSummaryView: View {
 
                         detailCards
 
+                        if let saveErrorMessage = viewModel.saveErrorMessage, !saveErrorMessage.isEmpty {
+                            Text(saveErrorMessage)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.red.opacity(0.9))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
                         Spacer().frame(height: 28)
                     }
                     .padding(.horizontal, BloomTheme.pagePadding)
                 }
 
-                BottomCTAButton(title: "Enter Bloom") {
-                    viewModel.finish()
+                BottomCTAButton(
+                    title: viewModel.isSaving ? "Saving..." : "Enter Bloom",
+                    enabled: !viewModel.isSaving
+                ) {
+                    Task {
+                        await viewModel.saveOnboardingIfPossible()
+                        if viewModel.saveErrorMessage == nil || viewModel.saveErrorMessage?.isEmpty == true {
+                            viewModel.finish()
+                        }
+                    }
                 }
                 .padding(.horizontal, BloomTheme.pagePadding)
                 .padding(.bottom, 24)
@@ -61,7 +76,7 @@ struct PersonalSummaryView: View {
                     endPoint: .bottomTrailing
                 )
             )
-            .frame(height: 240)
+            .frame(height: 250)
             .overlay(
                 VStack(alignment: .leading, spacing: 18) {
                     Circle()
@@ -94,17 +109,27 @@ struct PersonalSummaryView: View {
     private var detailCards: some View {
         VStack(spacing: 14) {
             SummaryMiniCard(
-                title: "Your current state",
-                value: viewModel.selectedMoodTitles.isEmpty
+                title: "What you’ve been carrying",
+                value: viewModel.selectedBlockerTitles.isEmpty
                     ? "Still exploring"
-                    : viewModel.selectedMoodTitles.joined(separator: ", ")
+                    : viewModel.selectedBlockerTitles.joined(separator: ", ")
             )
 
             SummaryMiniCard(
-                title: "What you want more of",
-                value: viewModel.selectedIntentTitles.isEmpty
-                    ? "More inner balance"
-                    : viewModel.selectedIntentTitles.joined(separator: ", ")
+                title: "What tends to repeat",
+                value: viewModel.selectedPatternTitles.isEmpty
+                    ? "Still exploring"
+                    : viewModel.selectedPatternTitles.joined(separator: ", ")
+            )
+
+            SummaryMiniCard(
+                title: "Your energy lately",
+                value: viewModel.selectedEnergyTitle
+            )
+
+            SummaryMiniCard(
+                title: "How things stay with you",
+                value: viewModel.selectedReactionTitle
             )
 
             SummaryMiniCard(

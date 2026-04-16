@@ -4,37 +4,37 @@
       "id": "m1",
       "emoji": "🌫️",
       "title": "Overwhelmed",
-      "subtitle": "My mind feels crowded"
+      "subtitle": "Too many thoughts at once"
     },
     {
       "id": "m2",
       "emoji": "🪫",
-      "title": "Drained",
-      "subtitle": "My energy feels low"
+      "title": "Low energy",
+      "subtitle": "Feeling drained often"
     },
     {
       "id": "m3",
       "emoji": "💭",
       "title": "Anxious",
-      "subtitle": "I’m carrying a lot mentally"
+      "subtitle": "Mind feels restless"
     },
     {
       "id": "m4",
       "emoji": "💔",
       "title": "Disconnected",
-      "subtitle": "I feel far from myself"
+      "subtitle": "Not fully myself"
     },
     {
       "id": "m5",
       "emoji": "🍂",
       "title": "Unmotivated",
-      "subtitle": "It’s hard to begin"
+      "subtitle": "Hard to take action"
     },
     {
       "id": "m6",
       "emoji": "🌙",
       "title": "Emotionally heavy",
-      "subtitle": "Things feel harder to hold"
+      "subtitle": "Carrying too much inside"
     }
   ],
   "intentions": [
@@ -42,63 +42,191 @@
       "id": "i1",
       "emoji": "🤍",
       "title": "Peace",
-      "subtitle": "More calm inside"
+      "subtitle": "Feel calmer inside"
     },
     {
       "id": "i2",
       "emoji": "✨",
       "title": "Confidence",
-      "subtitle": "Trusting myself more"
+      "subtitle": "Trust myself more"
     },
     {
       "id": "i3",
       "emoji": "🌸",
-      "title": "Self-love",
-      "subtitle": "A kinder inner voice"
+      "title": "Self-worth",
+      "subtitle": "Be kinder to myself"
     },
     {
       "id": "i4",
       "emoji": "🌿",
       "title": "Clarity",
-      "subtitle": "Clearer thoughts and focus"
+      "subtitle": "Think more clearly"
     },
     {
       "id": "i5",
       "emoji": "🛌",
-      "title": "Better sleep",
-      "subtitle": "Rest that feels deeper"
+      "title": "Better rest",
+      "subtitle": "Sleep peacefully"
     },
     {
       "id": "i6",
       "emoji": "💫",
       "title": "Abundance",
-      "subtitle": "Feeling open and supported"
+      "subtitle": "Feel open to opportunities"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "b1",
+      "emoji": "😞",
+      "title": "Doubting myself",
+      "subtitle": null
+    },
+    {
+      "id": "b2",
+      "emoji": "💔",
+      "title": "Struggling with self-love",
+      "subtitle": null
+    },
+    {
+      "id": "b3",
+      "emoji": "💸",
+      "title": "Financial stress",
+      "subtitle": null
+    },
+    {
+      "id": "b4",
+      "emoji": "😔",
+      "title": "Feeling stuck in life",
+      "subtitle": null
+    },
+    {
+      "id": "b5",
+      "emoji": "🍔",
+      "title": "Unhealthy habits",
+      "subtitle": null
+    },
+    {
+      "id": "b6",
+      "emoji": "🔋",
+      "title": "Low motivation",
+      "subtitle": null
+    }
+  ],
+  "patterns": [
+    {
+      "id": "p1",
+      "emoji": "🎯",
+      "title": "Trying to be perfect",
+      "subtitle": null
+    },
+    {
+      "id": "p2",
+      "emoji": "😰",
+      "title": "Fear of failing",
+      "subtitle": null
+    },
+    {
+      "id": "p3",
+      "emoji": "👉",
+      "title": "Blaming others",
+      "subtitle": null
+    },
+    {
+      "id": "p4",
+      "emoji": "🪞",
+      "title": "Comparing myself",
+      "subtitle": null
+    },
+    {
+      "id": "p5",
+      "emoji": "⏳",
+      "title": "Holding on to the past",
+      "subtitle": null
+    },
+    {
+      "id": "p6",
+      "emoji": "🥺",
+      "title": "Putting others before myself",
+      "subtitle": null
+    }
+  ],
+  "energy": [
+    {
+      "id": "e1",
+      "emoji": "🔋",
+      "title": "Most of the day",
+      "subtitle": null
+    },
+    {
+      "id": "e2",
+      "emoji": "⚡",
+      "title": "At certain times",
+      "subtitle": null
+    },
+    {
+      "id": "e3",
+      "emoji": "⏳",
+      "title": "Short bursts only",
+      "subtitle": null
+    },
+    {
+      "id": "e4",
+      "emoji": "🪫",
+      "title": "Rarely energized",
+      "subtitle": null
+    }
+  ],
+  "reaction": [
+    {
+      "id": "r1",
+      "emoji": "😎",
+      "title": "I move on fairly quickly",
+      "subtitle": null
+    },
+    {
+      "id": "r2",
+      "emoji": "🤔",
+      "title": "I think about it for hours",
+      "subtitle": null
+    },
+    {
+      "id": "r3",
+      "emoji": "😤",
+      "title": "It affects my whole day",
+      "subtitle": null
+    },
+    {
+      "id": "r4",
+      "emoji": "⏳",
+      "title": "It shapes everything that follows",
+      "subtitle": null
     }
   ],
   "supportStyles": [
     {
       "id": "s1",
       "icon": "sunrise.fill",
-      "title": "Morning encouragement",
-      "subtitle": "Short sessions to begin the day with steadiness and intention."
+      "title": "Morning reset",
+      "subtitle": "Start your day with clarity"
     },
     {
       "id": "s2",
       "icon": "moon.stars.fill",
-      "title": "Nighttime unwinding",
-      "subtitle": "Gentle listening for calmer evenings and softer sleep."
+      "title": "Night calm",
+      "subtitle": "Unwind before sleep"
     },
     {
       "id": "s3",
       "icon": "sparkles.rectangle.stack.fill",
-      "title": "Short daily resets",
-      "subtitle": "Simple emotional reset sessions you can return to anytime."
+      "title": "Quick resets",
+      "subtitle": "Anytime emotional reset"
     },
     {
       "id": "s4",
       "icon": "repeat.circle.fill",
-      "title": "Gentle mindset repetition",
-      "subtitle": "Supportive affirmations designed to become familiar and grounding."
+      "title": "Repetition",
+      "subtitle": "Affirmations that stick"
     }
   ]
 }

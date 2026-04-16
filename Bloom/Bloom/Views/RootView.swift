@@ -1,24 +1,36 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var viewModel = OnboardingViewModel()
+    @StateObject private var onboardingViewModel = OnboardingViewModel()
+    @StateObject private var authManager = AuthManager.shared
+
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var checkedSession = false
 
     var body: some View {
         Group {
-            if viewModel.showSplash {
-                SplashView(viewModel: viewModel)
-            } else {
-                NavigationStack {
-                    if viewModel.didFinishOnboarding {
-                        Text("Main app comes next")
-                            .font(.title2.bold())
-                            .foregroundStyle(BloomTheme.textPrimary)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(BloomTheme.background)
-                    } else {
-                        currentOnboardingView
-                    }
+            if onboardingViewModel.showSplash {
+                SplashView(viewModel: onboardingViewModel)
+            } else if !checkedSession {
+                ZStack {
+                    BloomTheme.background
+                        .ignoresSafeArea()
+
+                    ProgressView()
+                        .tint(BloomTheme.cream)
                 }
+                .task {
+                    await authManager.restoreSession()
+                    checkedSession = true
+                }
+            } else if !authManager.isAuthenticated {
+                AuthGateView()
+            } else if !hasCompletedOnboarding {
+                NavigationStack {
+                    currentOnboardingView
+                }
+            } else {
+                MainTabView()
             }
         }
         .background(BloomTheme.background.ignoresSafeArea())
@@ -26,17 +38,25 @@ struct RootView: View {
 
     @ViewBuilder
     private var currentOnboardingView: some View {
-        switch viewModel.currentStep {
+        switch onboardingViewModel.currentStep {
         case .intro:
-            IntroChoiceView(viewModel: viewModel)
+            IntroChoiceView(viewModel: onboardingViewModel)
         case .mood:
-            MoodSelectionView(viewModel: viewModel)
+            MoodSelectionView(viewModel: onboardingViewModel)
         case .intent:
-            IntentSelectionView(viewModel: viewModel)
+            IntentSelectionView(viewModel: onboardingViewModel)
+        case .blockers:
+            BlockersSelectionView(viewModel: onboardingViewModel)
+        case .patterns:
+            PatternsSelectionView(viewModel: onboardingViewModel)
+        case .energy:
+            EnergySelectionView(viewModel: onboardingViewModel)
+        case .reaction:
+            ReactionSelectionView(viewModel: onboardingViewModel)
         case .supportStyle:
-            SupportStyleView(viewModel: viewModel)
+            SupportStyleView(viewModel: onboardingViewModel)
         case .summary:
-            PersonalSummaryView(viewModel: viewModel)
+            PersonalSummaryView(viewModel: onboardingViewModel)
         }
     }
 }
