@@ -1,0 +1,104 @@
+{
+  "moods": [
+    {
+      "id": "m1",
+      "emoji": "🌫️",
+      "title": "Overwhelmed",
+      "subtitle": "My mind feels crowded"
+    },
+    {
+      "id": "m2",
+      "emoji": "🪫",
+      "title": "Drained",
+      "subtitle": "My energy feels low"
+    },
+    {
+      "id": "m3",
+      "emoji": "💭",
+      "title": "Anxious",
+      "subtitle": "I’m carrying a lot mentally"
+    },
+    {
+      "id": "m4",
+      "emoji": "💔",
+      "title": "Disconnected",
+      "subtitle": "I feel far from myself"
+    },
+    {
+      "id": "m5",
+      "emoji": "🍂",
+      "title": "Unmotivated",
+      "subtitle": "It’s hard to begin"
+    },
+    {
+      "id": "m6",
+      "emoji": "🌙",
+      "title": "Emotionally heavy",
+      "subtitle": "Things feel harder to hold"
+    }
+  ],
+  "intentions": [
+    {
+      "id": "i1",
+      "emoji": "🤍",
+      "title": "Peace",
+      "subtitle": "More calm inside"
+    },
+    {
+      "id": "i2",
+      "emoji": "✨",
+      "title": "Confidence",
+      "subtitle": "Trusting myself more"
+    },
+    {
+      "id": "i3",
+      "emoji": "🌸",
+      "title": "Self-love",
+      "subtitle": "A kinder inner voice"
+    },
+    {
+      "id": "i4",
+      "emoji": "🌿",
+      "title": "Clarity",
+      "subtitle": "Clearer thoughts and focus"
+    },
+    {
+      "id": "i5",
+      "emoji": "🛌",
+      "title": "Better sleep",
+      "subtitle": "Rest that feels deeper"
+    },
+    {
+      "id": "i6",
+      "emoji": "💫",
+      "title": "Abundance",
+      "subtitle": "Feeling open and supported"
+    }
+  ],
+  "supportStyles": [
+    {
+      "id": "s1",
+      "icon": "sunrise.fill",
+      "title": "Morning encouragement",
+      "subtitle": "Short sessions to begin the day with steadiness and intention."
+    },
+    {
+      "id": "s2",
+      "icon": "moon.stars.fill",
+      "title": "Nighttime unwinding",
+      "subtitle": "Gentle listening for calmer evenings and softer sleep."
+    },
+    {
+      "id": "s3",
+      "icon": "sparkles.rectangle.stack.fill",
+      "title": "Short daily resets",
+      "subtitle": "Simple emotional reset sessions you can return to anytime."
+    },
+    {
+      "id": "s4",
+      "icon": "repeat.circle.fill",
+      "title": "Gentle mindset repetition",
+      "subtitle": "Supportive affirmations designed to become familiar and grounding."
+    }
+  ]
+}
