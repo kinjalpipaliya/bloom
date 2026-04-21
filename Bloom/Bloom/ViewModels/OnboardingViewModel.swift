@@ -216,7 +216,7 @@ final class OnboardingViewModel: ObservableObject {
                 moods: selectedMoodTitles,
                 intentions: selectedIntentTitles,
                 blockers: selectedBlockerTitles,
-                patterns: selectedPatternTitles.first ?? "",
+                patterns: selectedPatternTitles,
                 energy: selectedEnergyTitle,
                 reaction: selectedReactionTitle,
                 supportStyle: selectedSupportStyleTitle

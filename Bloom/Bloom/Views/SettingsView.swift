@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var authManager = AuthManager.shared
+    @StateObject private var backgroundAudio = BackgroundAudioService.shared
 
     var body: some View {
         ZStack {
@@ -14,9 +15,69 @@ struct SettingsView: View {
                     .foregroundStyle(BloomTheme.textPrimary)
 
                 settingsRow("Notifications", "bell.fill")
-                settingsRow("Voice", "waveform")
                 settingsRow("Playback", "play.circle.fill")
                 settingsRow("About Bloom", "sparkles")
+
+                NavigationLink(destination: VoiceCloneSetupView()) {
+                    HStack(spacing: 14) {
+                        Circle()
+                            .fill(BloomTheme.elevatedBackground)
+                            .frame(width: 42, height: 42)
+                            .overlay(
+                                Image(systemName: "waveform.badge.mic")
+                                    .foregroundStyle(BloomTheme.cream)
+                            )
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("My Voice")
+                                .font(.system(size: 17, weight: .medium, design: .rounded))
+                                .foregroundStyle(BloomTheme.textPrimary)
+
+                            Text("Record your sample voice")
+                                .font(.system(size: 13))
+                                .foregroundStyle(BloomTheme.textSecondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(BloomTheme.textSecondary)
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 22)
+                            .fill(BloomTheme.card)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 22)
+                                    .stroke(BloomTheme.cardBorder, lineWidth: 1)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+
+                HStack {
+                    Text("Ambient music")
+                        .font(.system(size: 17, weight: .medium, design: .rounded))
+                        .foregroundStyle(BloomTheme.textPrimary)
+
+                    Spacer()
+
+                    Toggle("", isOn: Binding(
+                        get: { backgroundAudio.isEnabled },
+                        set: { backgroundAudio.setEnabled($0) }
+                    ))
+                    .labelsHidden()
+                    .tint(BloomTheme.cream)
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 22)
+                        .fill(BloomTheme.card)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 22)
+                                .stroke(BloomTheme.cardBorder, lineWidth: 1)
+                        )
+                )
 
                 Button {
                     Task {
@@ -32,10 +93,10 @@ struct SettingsView: View {
                     .foregroundStyle(.red.opacity(0.9))
                     .padding(16)
                     .background(
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        RoundedRectangle(cornerRadius: 22)
                             .fill(BloomTheme.card)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                RoundedRectangle(cornerRadius: 22)
                                     .stroke(BloomTheme.cardBorder, lineWidth: 1)
                             )
                     )
@@ -70,10 +131,10 @@ struct SettingsView: View {
         }
         .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            RoundedRectangle(cornerRadius: 22)
                 .fill(BloomTheme.card)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    RoundedRectangle(cornerRadius: 22)
                         .stroke(BloomTheme.cardBorder, lineWidth: 1)
                 )
         )

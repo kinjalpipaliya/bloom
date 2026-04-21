@@ -11,7 +11,7 @@ final class OnboardingService {
         let moods: [String]
         let intentions: [String]
         let blockers: [String]
-        let patterns: String
+        let patterns: [String]
         let energy: String
         let reaction: String
         let support_style: String
@@ -22,7 +22,7 @@ final class OnboardingService {
         moods: [String],
         intentions: [String],
         blockers: [String],
-        patterns: String,
+        patterns: [String],
         energy: String,
         reaction: String,
         supportStyle: String
