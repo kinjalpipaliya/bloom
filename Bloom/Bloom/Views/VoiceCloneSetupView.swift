@@ -6,6 +6,7 @@ struct VoiceCloneSetupView: View {
     @State private var isUploading = false
     @State private var uploadMessage: String?
     @State private var uploadedSampleURL: String?
+    @State private var isReplacingVoice = false
 
     var body: some View {
         ZStack {
@@ -16,9 +17,12 @@ struct VoiceCloneSetupView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     heroCard
                     instructionsCard
-                    recorderCard
 
-                    if uploadedSampleURL != nil {
+                    if shouldShowRecorderCard {
+                        recorderCard
+                    }
+
+                    if shouldShowSuccessCard {
                         successCard
                     }
 
@@ -45,6 +49,14 @@ struct VoiceCloneSetupView: View {
             await recorder.requestPermission()
             await loadExistingVoiceProfile()
         }
+    }
+
+    private var shouldShowRecorderCard: Bool {
+        uploadedSampleURL == nil || isReplacingVoice
+    }
+
+    private var shouldShowSuccessCard: Bool {
+        uploadedSampleURL != nil && !isReplacingVoice
     }
 
     private var heroCard: some View {
@@ -109,7 +121,7 @@ struct VoiceCloneSetupView: View {
     private var recorderCard: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack {
-                Text(uploadedSampleURL == nil ? "Voice sample" : "Update your voice")
+                Text(uploadedSampleURL == nil ? "Voice sample" : "Record a new sample")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .foregroundStyle(BloomTheme.textPrimary)
 
@@ -130,7 +142,7 @@ struct VoiceCloneSetupView: View {
 
             Text(uploadedSampleURL == nil
                  ? "Record a sample, preview it, then save it to Bloom."
-                 : "Want a better sample? Record a new one and replace the current voice.")
+                 : "Record a better sample and replace the one currently saved.")
                 .font(.system(size: 14))
                 .foregroundStyle(BloomTheme.textSecondary)
                 .lineSpacing(4)
@@ -208,20 +220,36 @@ struct VoiceCloneSetupView: View {
             .buttonStyle(.plain)
             .disabled(recorder.recordingURL == nil || isUploading)
 
-            if recorder.recordingURL != nil {
-                Button {
-                    recorder.deleteRecording()
-                    uploadMessage = nil
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                        Text("Delete local sample")
+            HStack(spacing: 16) {
+                if recorder.recordingURL != nil {
+                    Button {
+                        recorder.deleteRecording()
+                        uploadMessage = nil
+                    } label: {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Delete local sample")
+                        }
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .foregroundStyle(.red.opacity(0.9))
                     }
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(.red.opacity(0.9))
+                    .buttonStyle(.plain)
+                    .disabled(isUploading)
                 }
-                .buttonStyle(.plain)
-                .disabled(isUploading)
+
+                if uploadedSampleURL != nil && isReplacingVoice {
+                    Button {
+                        isReplacingVoice = false
+                        recorder.deleteRecording()
+                        uploadMessage = nil
+                    } label: {
+                        Text("Cancel")
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(BloomTheme.textSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isUploading)
+                }
             }
         }
         .padding(20)
@@ -264,9 +292,9 @@ struct VoiceCloneSetupView: View {
                 .lineSpacing(4)
 
             Button {
-                recorder.deleteRecording()
-                uploadedSampleURL = nil
+                isReplacingVoice = true
                 uploadMessage = nil
+                recorder.deleteRecording()
             } label: {
                 Text("Replace voice sample")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
@@ -334,6 +362,8 @@ struct VoiceCloneSetupView: View {
                 localFileURL: localURL
             )
             uploadedSampleURL = publicURL
+            isReplacingVoice = false
+            recorder.deleteRecording()
             uploadMessage = "Your Bloom voice is ready ✨"
         } catch {
             uploadMessage = "Failed to upload voice sample: \(error.localizedDescription)"

@@ -10,6 +10,10 @@ struct HomeView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
 
+    @State private var isGenerating = false
+    @State private var generatedSession: GeneratedSession?
+    @State private var generationError: String?
+
     var body: some View {
         ZStack {
             BloomTheme.background
@@ -55,6 +59,22 @@ struct HomeView: View {
             await loadData()
         }
         .navigationBarHidden(true)
+        .navigationDestination(item: $generatedSession) { session in
+            PlayerView(
+                session: Session(
+                    id: session.id,
+                    title: session.title,
+                    subtitle: session.subtitle,
+                    category: session.session_type,
+                    session_type: session.session_type,
+                    duration_seconds: session.duration_seconds ?? 60,
+                    cover_emoji: session.cover_emoji,
+                    audio_url: session.audio_url,
+                    script_text: session.script_text,
+                    is_featured: false
+                )
+            )
+        }
     }
 
     private var header: some View {
@@ -92,23 +112,64 @@ struct HomeView: View {
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
 
+            Button {
+                Task {
+                    await generateMySession()
+                }
+            } label: {
+                HStack {
+                    if isGenerating {
+                        ProgressView()
+                            .tint(Color.black.opacity(0.88))
+                    }
+
+                    Text(isGenerating ? "Generating..." : "Generate My Session")
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color.black.opacity(0.88))
+
+                    Spacer()
+
+                    Image(systemName: "wand.and.stars")
+                        .foregroundStyle(Color.black.opacity(0.88))
+                }
+                .padding(.horizontal, 18)
+                .frame(height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(BloomTheme.buttonGradient)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(isGenerating)
+
+            if let generationError, !generationError.isEmpty {
+                Text(generationError)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.red.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             if let firstSession = recommendedSessions.first ?? featuredSessions.first ?? allSessions.first {
                 NavigationLink(destination: PlayerView(session: firstSession)) {
                     HStack {
-                        Text("Start Session")
+                        Text("Start Existing Session")
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color.black.opacity(0.88))
+                            .foregroundStyle(BloomTheme.textPrimary)
 
                         Spacer()
 
                         Image(systemName: "play.fill")
-                            .foregroundStyle(Color.black.opacity(0.88))
+                            .foregroundStyle(BloomTheme.textPrimary)
                     }
                     .padding(.horizontal, 18)
                     .frame(height: 50)
                     .background(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(BloomTheme.buttonGradient)
+                            .fill(BloomTheme.elevatedBackground)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(BloomTheme.cardBorder, lineWidth: 1)
+                            )
                     )
                 }
                 .buttonStyle(.plain)
@@ -251,6 +312,25 @@ struct HomeView: View {
             errorMessage = error.localizedDescription
             isLoading = false
         }
+    }
+
+    private func generateMySession() async {
+        guard let userId = AuthManager.shared.currentUserId else {
+            generationError = "You must be signed in."
+            return
+        }
+
+        isGenerating = true
+        generationError = nil
+
+        do {
+            let session = try await GenerationService.shared.generateSession(userId: userId)
+            generatedSession = session
+        } catch {
+            generationError = error.localizedDescription
+        }
+
+        isGenerating = false
     }
 
     private func toggleSave(for session: Session) async {

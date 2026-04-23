@@ -31,11 +31,38 @@
 		AD1C82242F8F5FA40087FAE3 /* Bloom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bloom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD1C82342F8F5FA60087FAE3 /* BloomTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BloomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD1C823E2F8F5FA60087FAE3 /* BloomUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BloomUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD2961E92F9899B600530EDB /* main.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = main.py; sourceTree = "<group>"; };
+		AD2961EA2F9899C600530EDB /* config.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = config.py; sourceTree = "<group>"; };
+		AD2961EB2F9899D200530EDB /* db.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = db.py; sourceTree = "<group>"; };
+		AD2961ED2F9899E900530EDB /* generate.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate.py; sourceTree = "<group>"; };
+		AD2961EE2F9899F800530EDB /* generated_session.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generated_session.py; sourceTree = "<group>"; };
+		AD2961F02F989A1100530EDB /* onboarding_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = onboarding_service.py; sourceTree = "<group>"; };
+		AD2961F12F989A1C00530EDB /* voice_profile_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = voice_profile_service.py; sourceTree = "<group>"; };
+		AD2961F22F989A2800530EDB /* script_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = script_service.py; sourceTree = "<group>"; };
+		AD2961F32F989A3600530EDB /* voice_generation_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = voice_generation_service.py; sourceTree = "<group>"; };
+		AD2961F42F989A4100530EDB /* storage_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = storage_service.py; sourceTree = "<group>"; };
+		AD2961F52F989A4C00530EDB /* generated_session_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generated_session_service.py; sourceTree = "<group>"; };
+		AD2961F72F989A6200530EDB /* generate.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate.py; sourceTree = "<group>"; };
+		AD2961F82F989A7600530EDB /* requirements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = requirements.txt; sourceTree = "<group>"; };
+		AD2961F92F989A8800530EDB /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AD2962012F98FD9400530EDB /* Exceptions for "Bloom" folder in "Bloom" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AD1C82232F8F5FA40087FAE3 /* Bloom */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AD1C82262F8F5FA40087FAE3 /* Bloom */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AD2962012F98FD9400530EDB /* Exceptions for "Bloom" folder in "Bloom" target */,
+			);
 			path = Bloom;
 			sourceTree = "<group>";
 		};
@@ -80,6 +107,7 @@
 		AD1C821B2F8F5FA40087FAE3 = {
 			isa = PBXGroup;
 			children = (
+				AD2961E72F97ADE600530EDB /* bloom-backend */,
 				AD1C82262F8F5FA40087FAE3 /* Bloom */,
 				AD1C82372F8F5FA60087FAE3 /* BloomTests */,
 				AD1C82412F8F5FA60087FAE3 /* BloomUITests */,
@@ -103,6 +131,59 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AD2961E72F97ADE600530EDB /* bloom-backend */ = {
+			isa = PBXGroup;
+			children = (
+				AD2961F92F989A8800530EDB /* .env */,
+				AD2961F82F989A7600530EDB /* requirements.txt */,
+				AD2961E82F9899A300530EDB /* app */,
+			);
+			path = "bloom-backend";
+			sourceTree = "<group>";
+		};
+		AD2961E82F9899A300530EDB /* app */ = {
+			isa = PBXGroup;
+			children = (
+				AD2961F62F989A5800530EDB /* routes */,
+				AD2961EF2F989A0400530EDB /* services */,
+				AD2961EC2F9899DF00530EDB /* schemas */,
+				AD2961EB2F9899D200530EDB /* db.py */,
+				AD2961EA2F9899C600530EDB /* config.py */,
+				AD2961E92F9899B600530EDB /* main.py */,
+			);
+			path = app;
+			sourceTree = "<group>";
+		};
+		AD2961EC2F9899DF00530EDB /* schemas */ = {
+			isa = PBXGroup;
+			children = (
+				AD2961EE2F9899F800530EDB /* generated_session.py */,
+				AD2961ED2F9899E900530EDB /* generate.py */,
+			);
+			path = schemas;
+			sourceTree = "<group>";
+		};
+		AD2961EF2F989A0400530EDB /* services */ = {
+			isa = PBXGroup;
+			children = (
+				AD2961F52F989A4C00530EDB /* generated_session_service.py */,
+				AD2961F42F989A4100530EDB /* storage_service.py */,
+				AD2961F32F989A3600530EDB /* voice_generation_service.py */,
+				AD2961F22F989A2800530EDB /* script_service.py */,
+				AD2961F12F989A1C00530EDB /* voice_profile_service.py */,
+				AD2961F02F989A1100530EDB /* onboarding_service.py */,
+			);
+			path = services;
+			sourceTree = "<group>";
+		};
+		AD2961F62F989A5800530EDB /* routes */ = {
+			isa = PBXGroup;
+			children = (
+				AD2961F72F989A6200530EDB /* generate.py */,
+			);
+			path = routes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -417,6 +498,7 @@
 				DEVELOPMENT_TEAM = PR4DRHG9SG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bloom/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Bloom uses your microphone so you can record a short voice sample for personalized affirmations.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -448,6 +530,7 @@
 				DEVELOPMENT_TEAM = PR4DRHG9SG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bloom/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Bloom uses your microphone so you can record a short voice sample for personalized affirmations.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
