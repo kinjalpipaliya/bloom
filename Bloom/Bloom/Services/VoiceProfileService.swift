@@ -7,7 +7,7 @@ final class VoiceProfileService {
     private init() {}
 
     struct VoiceProfileUpsert: Encodable {
-        let user_id: UUID
+        let user_id: String
         let sample_audio_url: String
     }
 
@@ -15,8 +15,8 @@ final class VoiceProfileService {
         let id: UUID
         let user_id: UUID
         let sample_audio_url: String
-        let created_at: String
-        let updated_at: String
+        let created_at: String?
+        let updated_at: String?
     }
 
     func uploadVoiceSample(userId: UUID, localFileURL: URL) async throws -> String {
@@ -40,13 +40,13 @@ final class VoiceProfileService {
             .getPublicURL(path: storagePath)
 
         let payload = VoiceProfileUpsert(
-            user_id: userId,
+            user_id: userId.uuidString,
             sample_audio_url: publicURL.absoluteString
         )
 
         try await SupabaseManager.shared.client
             .from("user_voice_profiles")
-            .upsert(payload)
+            .upsert(payload, onConflict: "user_id")
             .execute()
 
         return publicURL.absoluteString

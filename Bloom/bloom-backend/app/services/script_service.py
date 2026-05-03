@@ -1,63 +1,70 @@
 def build_personalized_script(onboarding: dict) -> dict:
-    intentions = [x.lower() for x in onboarding.get("intentions", [])]
-    moods = [x.lower() for x in onboarding.get("moods", [])]
-    blockers = [x.lower() for x in onboarding.get("blockers", [])]
-    energy = (onboarding.get("energy") or "").lower()
-    support_style = (onboarding.get("support_style") or "").lower()
+    moods = onboarding.get("moods", []) or []
+    intentions = onboarding.get("intentions", []) or []
+    blockers = onboarding.get("blockers", []) or []
+    energy = onboarding.get("energy") or ""
+    support_style = onboarding.get("support_style") or ""
 
-    title = "Personal Reset"
-    subtitle = "A moment to return to yourself"
-    lines = []
+    mood_text = ", ".join(moods[:2]) if moods else "a little heavy"
+    intention_text = ", ".join(intentions[:2]) if intentions else "calm and clarity"
+    blocker_text = blockers[0] if blockers else "overthinking"
 
-    if any("peace" in item or "calm" in item for item in intentions):
-        title = "Calm Within"
-        subtitle = "A softer space for peace"
-        lines.extend([
-            "You are safe in this moment.",
-            "Nothing needs to be solved all at once.",
-            "With each breath, your mind becomes quieter."
-        ])
+    title = "Gentle Reset"
+    subtitle = "A moment to breathe and return to yourself"
+    cover_emoji = "🌿"
 
-    if any("confidence" in item or "self" in item for item in intentions + blockers):
-        title = "Return to Self-Trust"
-        subtitle = "A gentle confidence reset"
-        lines.extend([
-            "You do not need to earn your worth.",
-            "You are allowed to trust yourself again.",
-            "Your voice matters, and your presence is enough."
-        ])
-
-    if any("rest" in item or "sleep" in item for item in intentions) or "drained" in energy:
+    if any("rest" in item.lower() or "sleep" in item.lower() for item in intentions):
         title = "Evening Exhale"
         subtitle = "Let your mind soften before rest"
-        lines.extend([
-            "Your body is allowed to rest now.",
-            "You can release the weight of today.",
-            "Sleep begins with letting go."
-        ])
+        cover_emoji = "🌙"
 
-    if not lines:
-        lines = [
-            "Take one slow breath in.",
-            "Take one slow breath out.",
-            "Come back to yourself, one moment at a time.",
-            "You are here, and that is enough for now."
-        ]
+    if any("confidence" in item.lower() or "self" in item.lower() for item in intentions + blockers):
+        title = "Return to Self-Trust"
+        subtitle = "A gentle reminder of your worth"
+        cover_emoji = "✨"
 
-    if any("overwhelmed" in item or "anxious" in item for item in moods + blockers):
-        lines.append("You do not have to carry everything at once.")
+    script_text = f"""
+Hey… take a moment.
 
-    if "gentle" in support_style:
-        lines.append("Let this moment be soft and steady.")
-    elif "direct" in support_style:
-        lines.append("You are ready to move forward with clarity.")
+You don’t have to carry everything right now.
 
-    script_text = " ".join(lines)
+If you’ve been feeling {mood_text}, that’s okay.
+
+Just breathe in… slowly…
+
+And gently breathe out.
+
+There’s nothing you need to fix in this moment.
+
+Even with {blocker_text}, you’re still showing up.
+
+And that matters.
+
+Let your shoulders drop.
+
+Let your mind soften.
+
+You don’t need to rush anything.
+
+Right now, you’re allowed to pause.
+
+You’re allowed to reset.
+
+And with time, you’re moving closer to {intention_text}.
+
+Even if it doesn’t feel like it yet.
+
+Stay here for a few seconds.
+
+You’re doing better than you think.
+
+And you are exactly where you need to be.
+""".strip()
 
     return {
         "title": title,
         "subtitle": subtitle,
         "script_text": script_text,
         "session_type": "personalized_affirmation",
-        "cover_emoji": "✨",
+        "cover_emoji": cover_emoji,
     }

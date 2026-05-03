@@ -12,7 +12,11 @@ router = APIRouter(tags=["generation"])
 
 @router.post("/generate-session")
 async def generate_session(payload: GenerateSessionRequest):
+    print("1. generate-session started", flush=True)
+    
     onboarding = get_latest_onboarding_response(payload.user_id)
+    print("2. onboarding loaded", flush=True)
+
     if not onboarding:
         raise HTTPException(
             status_code=404,
@@ -23,6 +27,8 @@ async def generate_session(payload: GenerateSessionRequest):
         )
 
     voice_profile = get_voice_profile(payload.user_id)
+    print("3. voice profile loaded", flush=True)
+    
     if not voice_profile:
         raise HTTPException(
             status_code=404,
@@ -33,14 +39,18 @@ async def generate_session(payload: GenerateSessionRequest):
         )
 
     script_payload = build_personalized_script(onboarding)
+    print("4. script built", flush=True)
+    
     generation_result = await generate_voice_audio(
         script_text=script_payload["script_text"],
         voice_profile=voice_profile,
     )
 
+    print("5. voice audio generated", flush=True)
     final_audio_url = generation_result["audio_url"]
 
     if generation_result["audio_bytes"]:
+        print("6. uploading generated audio", flush=True)
         file_name = f"{script_payload['title'].lower().replace(' ', '-')}.mp3"
         final_audio_url = upload_generated_audio(
             user_id=payload.user_id,
@@ -48,7 +58,7 @@ async def generate_session(payload: GenerateSessionRequest):
             audio_bytes=generation_result["audio_bytes"],
             content_type="audio/mpeg",
         )
-
+        print("7. generated audio uploaded", flush=True)
     created = create_generated_session(
         user_id=payload.user_id,
         source_voice_profile_id=voice_profile.get("id"),
@@ -72,6 +82,8 @@ async def generate_session(payload: GenerateSessionRequest):
                 "message": "Generated session could not be saved."
             }
         )
+        
+        print("8. generated session saved", flush=True)
 
     return {
         "success": True,

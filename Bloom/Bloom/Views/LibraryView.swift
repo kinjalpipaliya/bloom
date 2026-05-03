@@ -1,35 +1,33 @@
 import SwiftUI
 
 struct LibraryView: View {
+    @State private var generatedSessions: [Session] = []
     @State private var savedSessionIDs: Set<UUID> = []
-    @State private var allSessions: [Session] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
 
-    private var savedSessions: [Session] {
-        allSessions.filter { savedSessionIDs.contains($0.id) }
+    private struct GeneratedSessionRow: Decodable {
+        let id: UUID
+        let title: String
+        let subtitle: String?
+        let script_text: String
+        let audio_url: String
+        let session_type: String?
+        let duration_seconds: Int?
+        let cover_emoji: String?
+        let created_at: String?
     }
 
     var body: some View {
         ZStack {
-            BloomTheme.background
-                .ignoresSafeArea()
+            BloomTheme.background.ignoresSafeArea()
 
             if isLoading {
-                ProgressView()
-                    .tint(BloomTheme.cream)
+                ProgressView().tint(BloomTheme.cream)
             } else if let errorMessage {
-                VStack(spacing: 12) {
-                    Text("Something went wrong")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(BloomTheme.textPrimary)
-
-                    Text(errorMessage)
-                        .font(.system(size: 14))
-                        .foregroundStyle(BloomTheme.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                }
+                Text(errorMessage)
+                    .foregroundStyle(.red)
+                    .padding()
             } else {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
@@ -37,23 +35,22 @@ struct LibraryView: View {
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(BloomTheme.textPrimary)
 
-                        if savedSessions.isEmpty {
+                        if generatedSessions.isEmpty {
                             emptyState
                         } else {
-                            Text("Saved sessions")
+                            Text("Your generated sessions")
                                 .font(.system(size: 22, weight: .bold, design: .rounded))
                                 .foregroundStyle(BloomTheme.textPrimary)
 
-                            VStack(spacing: 12) {
-                                ForEach(savedSessions) { session in
-                                    SavedSessionRow(session: session) {
-                                        await removeSave(for: session)
-                                    }
+                            ForEach(generatedSessions) { session in
+                                SessionRow(
+                                    session: session,
+                                    isSaved: savedSessionIDs.contains(session.id)
+                                ) {
+                                    await toggleSave(for: session)
                                 }
                             }
                         }
-
-                        Spacer(minLength: 24)
                     }
                     .padding(BloomTheme.pagePadding)
                 }
@@ -71,22 +68,20 @@ struct LibraryView: View {
             .frame(height: 180)
             .overlay(
                 VStack(spacing: 12) {
-                    Image(systemName: "heart.text.square")
+                    Image(systemName: "sparkles")
                         .font(.system(size: 30))
                         .foregroundStyle(BloomTheme.cream)
 
-                    Text("No saved sessions yet")
+                    Text("No generated sessions yet")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .foregroundStyle(BloomTheme.textPrimary)
 
-                    Text("Tap the heart on any session to save it here.")
+                    Text("Generate a personalized affirmation and it will appear here.")
                         .font(.system(size: 14))
                         .foregroundStyle(BloomTheme.textSecondary)
+                        .multilineTextAlignment(.center)
                 }
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(BloomTheme.cardBorder, lineWidth: 1)
+                .padding()
             )
     }
 
@@ -97,10 +92,10 @@ struct LibraryView: View {
         }
 
         do {
-            async let sessions = SessionService.shared.fetchAllSessions()
+            async let sessions = fetchGeneratedSessions(for: userId)
             async let savedIDs = FavoritesService.shared.fetchSavedSessionIDs(for: userId)
 
-            allSessions = try await sessions
+            generatedSessions = try await sessions
             savedSessionIDs = try await savedIDs
             isLoading = false
         } catch {
@@ -109,25 +104,59 @@ struct LibraryView: View {
         }
     }
 
-    private func removeSave(for session: Session) async {
+    private func fetchGeneratedSessions(for userId: UUID) async throws -> [Session] {
+        let response = try await SupabaseManager.shared.client
+            .from("generated_sessions")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+
+        let rows = try JSONDecoder().decode([GeneratedSessionRow].self, from: response.data)
+
+        return rows.map { row in
+            Session(
+                id: row.id,
+                title: row.title,
+                subtitle: row.subtitle,
+                category: row.session_type ?? "personalized_affirmation",
+                session_type: row.session_type ?? "personalized_affirmation",
+                duration_seconds: row.duration_seconds ?? 60,
+                cover_emoji: row.cover_emoji,
+                audio_url: row.audio_url,
+                script_text: row.script_text,
+                is_featured: false
+            )
+        }
+    }
+
+    private func toggleSave(for session: Session) async {
         guard let userId = AuthManager.shared.currentUserId else { return }
 
+        let isCurrentlySaved = savedSessionIDs.contains(session.id)
+
         do {
-            try await FavoritesService.shared.removeSavedSession(
+            try await FavoritesService.shared.toggleSavedSession(
                 userId: userId,
-                sessionId: session.id
+                sessionId: session.id,
+                isCurrentlySaved: isCurrentlySaved
             )
 
-            savedSessionIDs.remove(session.id)
+            if isCurrentlySaved {
+                savedSessionIDs.remove(session.id)
+            } else {
+                savedSessionIDs.insert(session.id)
+            }
         } catch {
-            print("Failed to remove saved session: \(error)")
+            print("Failed to toggle save:", error)
         }
     }
 }
 
-private struct SavedSessionRow: View {
+private struct SessionRow: View {
     let session: Session
-    let onRemove: () async -> Void
+    let isSaved: Bool
+    let onToggleSave: () async -> Void
 
     var body: some View {
         NavigationLink(destination: PlayerView(session: session)) {
@@ -150,15 +179,16 @@ private struct SavedSessionRow: View {
                 Spacer()
 
                 Button {
-                    Task {
-                        await onRemove()
-                    }
+                    Task { await onToggleSave() }
                 } label: {
-                    Image(systemName: "heart.fill")
-                        .foregroundStyle(BloomTheme.rose)
+                    Image(systemName: isSaved ? "heart.fill" : "heart")
+                        .foregroundStyle(isSaved ? BloomTheme.rose : BloomTheme.cream)
                         .font(.system(size: 18, weight: .medium))
                 }
                 .buttonStyle(.plain)
+
+                Image(systemName: "play.fill")
+                    .foregroundStyle(BloomTheme.cream)
             }
             .padding(16)
             .background(

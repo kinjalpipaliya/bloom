@@ -3,9 +3,7 @@ import Foundation
 final class GenerationService {
     static let shared = GenerationService()
 
-    // Change this when you test on a real device.
-    // Simulator can use 127.0.0.1. Real device should use your Mac's local IP.
-    private let baseURL = "http://192.168.68.100:8000"
+    private let baseURL = "http://192.168.68.101:8000"
 
     private init() {}
 
@@ -16,12 +14,18 @@ final class GenerationService {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.timeoutInterval = 300
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body = ["user_id": userId.uuidString]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 300
+        config.timeoutIntervalForResource = 300
+
+        let session = URLSession(configuration: config)
+        let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)

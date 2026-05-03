@@ -14,14 +14,24 @@ struct HomeView: View {
     @State private var generatedSession: GeneratedSession?
     @State private var generationError: String?
 
+    private struct GeneratedSessionRow: Decodable {
+        let id: UUID
+        let title: String
+        let subtitle: String?
+        let script_text: String
+        let audio_url: String
+        let session_type: String?
+        let duration_seconds: Int?
+        let cover_emoji: String?
+        let created_at: String?
+    }
+
     var body: some View {
         ZStack {
-            BloomTheme.background
-                .ignoresSafeArea()
+            BloomTheme.background.ignoresSafeArea()
 
             if isLoading {
-                ProgressView()
-                    .tint(BloomTheme.cream)
+                ProgressView().tint(BloomTheme.cream)
             } else if let errorMessage {
                 VStack(spacing: 12) {
                     Text("Something went wrong")
@@ -44,7 +54,10 @@ struct HomeView: View {
                             recommendedSection
                         }
 
-                        featuredSection
+                        if !featuredSessions.isEmpty {
+                            featuredSection
+                        }
+
                         allSessionsSection
 
                         Spacer(minLength: 24)
@@ -113,14 +126,11 @@ struct HomeView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Button {
-                Task {
-                    await generateMySession()
-                }
+                Task { await generateMySession() }
             } label: {
                 HStack {
                     if isGenerating {
-                        ProgressView()
-                            .tint(Color.black.opacity(0.88))
+                        ProgressView().tint(Color.black.opacity(0.88))
                     }
 
                     Text(isGenerating ? "Generating..." : "Generate My Session")
@@ -149,7 +159,7 @@ struct HomeView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            if let firstSession = recommendedSessions.first ?? featuredSessions.first ?? allSessions.first {
+            if let firstSession = recommendedSessions.first ?? allSessions.first {
                 NavigationLink(destination: PlayerView(session: firstSession)) {
                     HStack {
                         Text("Start Existing Session")
@@ -203,9 +213,7 @@ struct HomeView: View {
                 SessionRow(
                     session: session,
                     isSaved: savedSessionIDs.contains(session.id),
-                    onToggleSave: {
-                        await toggleSave(for: session)
-                    }
+                    onToggleSave: { await toggleSave(for: session) }
                 )
             }
         }
@@ -221,9 +229,7 @@ struct HomeView: View {
                 SessionRow(
                     session: session,
                     isSaved: savedSessionIDs.contains(session.id),
-                    onToggleSave: {
-                        await toggleSave(for: session)
-                    }
+                    onToggleSave: { await toggleSave(for: session) }
                 )
             }
         }
@@ -231,18 +237,28 @@ struct HomeView: View {
 
     private var allSessionsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("All sessions")
+            Text("Your generated sessions")
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(BloomTheme.textPrimary)
 
-            ForEach(allSessions) { session in
-                SessionRow(
-                    session: session,
-                    isSaved: savedSessionIDs.contains(session.id),
-                    onToggleSave: {
-                        await toggleSave(for: session)
-                    }
-                )
+            if allSessions.isEmpty {
+                Text("Generate your first personalized affirmation to see it here.")
+                    .font(.system(size: 15))
+                    .foregroundStyle(BloomTheme.textSecondary)
+                    .padding(18)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 22)
+                            .fill(BloomTheme.card)
+                    )
+            } else {
+                ForEach(allSessions) { session in
+                    SessionRow(
+                        session: session,
+                        isSaved: savedSessionIDs.contains(session.id),
+                        onToggleSave: { await toggleSave(for: session) }
+                    )
+                }
             }
         }
     }
@@ -287,30 +303,50 @@ struct HomeView: View {
 
     private func loadData() async {
         do {
-            async let featured = SessionService.shared.fetchFeaturedSessions()
-            async let all = SessionService.shared.fetchAllSessions()
-
-            let featuredResult = try await featured
-            let allResult = try await all
-
-            featuredSessions = featuredResult
-            allSessions = allResult
-
             if let userId = AuthManager.shared.currentUserId {
                 async let latestOnboarding = ProfileService.shared.fetchLatestOnboardingResponse(for: userId)
                 async let savedIDs = FavoritesService.shared.fetchSavedSessionIDs(for: userId)
+                async let generated = fetchGeneratedSessions(for: userId)
 
                 onboardingResponse = try await latestOnboarding
                 savedSessionIDs = try await savedIDs
-                recommendedSessions = buildRecommendations(from: allResult, onboarding: onboardingResponse)
-            } else {
-                recommendedSessions = Array(allResult.prefix(3))
+
+                let generatedSessions = try await generated
+                allSessions = generatedSessions
+                recommendedSessions = Array(generatedSessions.prefix(3))
+                featuredSessions = []
             }
 
             isLoading = false
         } catch {
             errorMessage = error.localizedDescription
             isLoading = false
+        }
+    }
+
+    private func fetchGeneratedSessions(for userId: UUID) async throws -> [Session] {
+        let response = try await SupabaseManager.shared.client
+            .from("generated_sessions")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("created_at", ascending: false)
+            .execute()
+
+        let rows = try JSONDecoder().decode([GeneratedSessionRow].self, from: response.data)
+
+        return rows.map { row in
+            Session(
+                id: row.id,
+                title: row.title,
+                subtitle: row.subtitle,
+                category: row.session_type ?? "personalized_affirmation",
+                session_type: row.session_type ?? "personalized_affirmation",
+                duration_seconds: row.duration_seconds ?? 60,
+                cover_emoji: row.cover_emoji,
+                audio_url: row.audio_url,
+                script_text: row.script_text,
+                is_featured: false
+            )
         }
     }
 
@@ -324,8 +360,25 @@ struct HomeView: View {
         generationError = nil
 
         do {
-            let session = try await GenerationService.shared.generateSession(userId: userId)
-            generatedSession = session
+            let generated = try await GenerationService.shared.generateSession(userId: userId)
+
+            let newSession = Session(
+                id: generated.id,
+                title: generated.title,
+                subtitle: generated.subtitle,
+                category: generated.session_type,
+                session_type: generated.session_type,
+                duration_seconds: generated.duration_seconds ?? 60,
+                cover_emoji: generated.cover_emoji,
+                audio_url: generated.audio_url,
+                script_text: generated.script_text,
+                is_featured: false
+            )
+
+            allSessions.insert(newSession, at: 0)
+            recommendedSessions.insert(newSession, at: 0)
+            generatedSession = generated
+
         } catch {
             generationError = error.localizedDescription
         }
@@ -353,66 +406,6 @@ struct HomeView: View {
         } catch {
             print("Failed to toggle save: \(error)")
         }
-    }
-
-    private func buildRecommendations(from sessions: [Session], onboarding: OnboardingResponse?) -> [Session] {
-        guard let onboarding else {
-            return Array(sessions.prefix(3))
-        }
-
-        let preferenceKeywords = (onboarding.intentions + onboarding.moods + onboarding.blockers)
-            .map { $0.lowercased() }
-
-        let scored = sessions.map { session -> (Session, Int) in
-            let title = session.title.lowercased()
-            let subtitle = (session.subtitle ?? "").lowercased()
-            let category = session.category.lowercased()
-
-            var score = 0
-
-            for keyword in preferenceKeywords {
-                if keyword.contains("peace") || keyword.contains("calm") {
-                    if title.contains("calm") || category.contains("peace") || subtitle.contains("quiet") {
-                        score += 3
-                    }
-                }
-
-                if keyword.contains("confidence") || keyword.contains("self-worth") || keyword.contains("doubting") {
-                    if title.contains("confidence") || category.contains("confidence") || subtitle.contains("self-trust") {
-                        score += 3
-                    }
-                }
-
-                if keyword.contains("rest") || keyword.contains("sleep") || keyword.contains("drained") || keyword.contains("low energy") {
-                    if title.contains("sleep") || category.contains("sleep") || subtitle.contains("rest") {
-                        score += 3
-                    }
-                }
-
-                if keyword.contains("clarity") || keyword.contains("overwhelmed") || keyword.contains("anxious") {
-                    if title.contains("calm") || title.contains("mind") || category.contains("clarity") || subtitle.contains("mental") {
-                        score += 3
-                    }
-                }
-            }
-
-            if session.is_featured {
-                score += 1
-            }
-
-            return (session, score)
-        }
-
-        return scored
-            .sorted { lhs, rhs in
-                if lhs.1 == rhs.1 {
-                    return lhs.0.title < rhs.0.title
-                }
-                return lhs.1 > rhs.1
-            }
-            .map(\.0)
-            .prefix(3)
-            .map { $0 }
     }
 }
 

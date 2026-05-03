@@ -3,23 +3,23 @@ import Supabase
 
 final class SessionService {
     static let shared = SessionService()
-
     private init() {}
 
-    func fetchFeaturedSessions() async throws -> [Session] {
-        let response = try await SupabaseManager.shared.client
-            .from("sessions")
-            .select()
-            .eq("is_featured", value: true)
-            .execute()
-
-        return try JSONDecoder().decode([Session].self, from: response.data)
+    struct Session: Decodable, Identifiable {
+        let id: UUID
+        let title: String
+        let subtitle: String
+        let audio_url: String
+        let script_text: String
+        let created_at: String
     }
 
-    func fetchAllSessions() async throws -> [Session] {
+    func fetchSessions(userId: UUID) async throws -> [Session] {
         let response = try await SupabaseManager.shared.client
-            .from("sessions")
+            .from("generated_sessions")
             .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("created_at", ascending: false)
             .execute()
 
         return try JSONDecoder().decode([Session].self, from: response.data)
