@@ -19,7 +19,6 @@ def _download_voice_sample(sample_audio_url: str) -> str:
 
     return temp_file.name
 
-
 def _create_instant_voice_clone(client: ElevenLabs, sample_audio_url: str) -> str:
     print("Downloading voice sample...", flush=True)
 
